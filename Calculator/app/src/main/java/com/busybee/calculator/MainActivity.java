@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.EditText;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Button button15;    // "+" operation button
 
     private Button deleteButton;
-  
+
     private Double operand1 = null;
     private Double operand2 = null;
     private Double ans = null;
@@ -95,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                         digitOrDotClickListerner(v);
                         break;
                     case 13:
+                        digitOrDotClickListerner(v);
                         break;
                     case 14:
                         operationButtonClickListerner(v);
@@ -121,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         Button button = (Button) view;
         temp = resultText.getText().toString();
         resultText.setText(temp + button.getText().toString());
-        Log.d("resultText : ", resultText.getText().toString());
         if (previousOperation.equals("=")){
             operand1 = Double.valueOf(resultText.getText().toString());
         }
@@ -156,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
             else{
                 resultText.setText(operand1.toString());
             }
-
         }
         else if(operand2 == null && previousOperation.equals("=")){
             if (!button.getText().toString().equals("=")) {

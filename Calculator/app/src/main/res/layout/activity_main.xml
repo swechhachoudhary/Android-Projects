@@ -16,7 +16,6 @@
         android:layout_height="40dp"
         android:id="@+id/resultText"
         android:hint="Result"
-        android:inputType="numberDecimal|numberSigned"
         android:paddingLeft="10dp"
         android:layout_toLeftOf="@+id/delete"
         android:layout_alignParentLeft="true"
