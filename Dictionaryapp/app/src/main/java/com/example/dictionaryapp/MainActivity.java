@@ -3,6 +3,7 @@ package com.example.dictionaryapp;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -28,24 +29,41 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    SharedPreferences sharedPref;
+
     TextView textView;
     TextView resusltTxt;
     SearchView searchView;
-
+    String JSONSTR;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null){
+            GetWordOfTheDayTask getWordOfTheDayTask = new GetWordOfTheDayTask();
+            getWordOfTheDayTask.execute();
+            Log.d("SavedInstance : ", "null");
+        }
+        else{
+            Log.d("SavedInstance : ", "not null");
+            DisplayWordOfTheDayResult(JSONSTR);
+        }
+
         setContentView(R.layout.activity_main);
 
         textView = (TextView) findViewById(R.id.textView);
         resusltTxt = (TextView) findViewById(R.id.meaning);
 
-        GetWordOfTheDayTask getWordOfTheDayTask = new GetWordOfTheDayTask();
-        getWordOfTheDayTask.execute();
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+
+//        GetWordOfTheDayTask getWordOfTheDayTask = new GetWordOfTheDayTask();
+//        getWordOfTheDayTask.execute();
 
         // Get the SearchView and set the searchable configuration
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) findViewById(R.id.searchView);
+
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
@@ -79,6 +97,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    //    @Override
+//    protected void onPostResume() {
+//        super.onPostResume();
+//        String jsonStr = sharedPref.getString("JSONStr",null);
+//        DisplayWordOfTheDayResult(jsonStr);
+//        Log.d("OnPostResume : ", "done");
+//    }
 
     public class GetWordOfTheDayTask extends AsyncTask<String, Void, String> {
 
@@ -154,41 +190,47 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String JsonStr) {
-            if(JsonStr != null){
-
-                final String WORD_MEANING = "text";
-                final String PART_OF_SPEECH = "partOfSpeech";
-                String resultStr = "No word found.";
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(JsonStr);
-                    textView.setText(jsonObject.getString("word"));
-                    JSONArray jsonArray = jsonObject.getJSONArray("definitions");
-                    JSONObject jsonObj = jsonArray.getJSONObject(0);
-                    resultStr = PART_OF_SPEECH + " : " +jsonObj.getString(PART_OF_SPEECH) + "\n\n" + "Meaning : \n";
-                    for (int i = 0; i < jsonArray.length(); i++){
-                        JSONObject jsonOBJECT = jsonArray.getJSONObject(i);
-                        resultStr = resultStr + jsonOBJECT.getString(WORD_MEANING) + "\n";
-                    }
-
-                    jsonArray = jsonObject.getJSONArray("examples");
-                    resultStr = resultStr + "\nExamples" + "\n";
-                    for (int i = 0; i < jsonArray.length(); i++){
-                        JSONObject jsonOBJECT = jsonArray.getJSONObject(i);
-                        int j = i+1;
-                        resultStr = resultStr + j + ". " +jsonOBJECT.getString("text") + "\n";
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.v(LOG_TAG, "Word meaning: " + resultStr);
-                resusltTxt.setText(resultStr);
-            }
-
+            JSONSTR = JsonStr;
+            DisplayWordOfTheDayResult(JsonStr);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("JSONStr", JsonStr);
+            editor.commit();
         }
     }
 
+    public void DisplayWordOfTheDayResult(String jsonStr){
+        if(jsonStr != null){
+
+            final String WORD_MEANING = "text";
+            final String PART_OF_SPEECH = "partOfSpeech";
+            String resultStr = "No word found.";
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(jsonStr);
+                textView.setText(jsonObject.getString("word"));
+                JSONArray jsonArray = jsonObject.getJSONArray("definitions");
+                JSONObject jsonObj = jsonArray.getJSONObject(0);
+                resultStr = PART_OF_SPEECH + " : " +jsonObj.getString(PART_OF_SPEECH) + "\n\n" + "Meaning : \n";
+                for (int i = 0; i < jsonArray.length(); i++){
+                    JSONObject jsonOBJECT = jsonArray.getJSONObject(i);
+                    resultStr = resultStr + jsonOBJECT.getString(WORD_MEANING) + "\n";
+                }
+
+                jsonArray = jsonObject.getJSONArray("examples");
+                resultStr = resultStr + "\nExamples" + "\n";
+                for (int i = 0; i < jsonArray.length(); i++){
+                    JSONObject jsonOBJECT = jsonArray.getJSONObject(i);
+                    int j = i+1;
+                    resultStr = resultStr + j + ". " +jsonOBJECT.getString("text") + "\n";
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.v("Word meaning: ", resultStr);
+            resusltTxt.setText(resultStr);
+        }
+    }
 
 }
