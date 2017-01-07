@@ -1,16 +1,15 @@
 package com.example.dictionaryapp;
 
-import android.content.Intent;
+import android.app.SearchManager;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class SearchResultActivity extends AppCompatActivity {
+public class SearchableActivity extends AppCompatActivity {
 
     TextView wordTxt, meaningTxt;
     String word;
@@ -27,21 +26,32 @@ public class SearchResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_result);
-
         wordTxt = (TextView) findViewById(R.id.word);
         meaningTxt = (TextView) findViewById(R.id.meaning);
 
-        Intent intent = getIntent();
-        word = intent.getStringExtra("query");
-        wordTxt.setText(word);
-        GetWordMeaningTask getWordMeaningTask = new GetWordMeaningTask();
-        getWordMeaningTask.execute(word.trim().toLowerCase());
+        handleIntent(getIntent());
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            word = query;
+            wordTxt.setText(word);
+            GetWordMeaningTask getWordMeaningTask = new GetWordMeaningTask();
+            getWordMeaningTask.execute(word.trim().toLowerCase());
+        }
     }
 
     public class GetWordMeaningTask extends AsyncTask<String, Void, String> {
 
-        private final String LOG_TAG = SearchResultActivity.GetWordMeaningTask.class.getSimpleName();
+        private final String LOG_TAG = SearchableActivity.GetWordMeaningTask.class.getSimpleName();
 
         @Override
         protected String doInBackground(String... params) {
@@ -56,10 +66,6 @@ public class SearchResultActivity extends AppCompatActivity {
                 final String BASE_URL1 = "http://api.wordnik.com:80/v4/word.json/";
                 final String BASE_URL2 = "/definitions?limit=200&includeRelated=true&useCanonical=false&includeTags=false&api_key=54d58ad1400c9bc39d59b4c5dae05829cb6d4086bcfe2c886";
                 final String BASE_URL = BASE_URL1 + params[0] + BASE_URL2;
-
-//                final String EX_API_URL = "http://api.wordnik.com:80/v4/word.json/";
-//                final String EX_API_URL1 = "/topExample?useCanonical=false&api_key=54d58ad1400c9bc39d59b4c5dae05829cb6d4086bcfe2c886";
-//                final String EX_URL = EX_API_URL + params[0] + EX_API_URL1;
 
                 URL url = new URL(BASE_URL);
 
@@ -144,5 +150,4 @@ public class SearchResultActivity extends AppCompatActivity {
 
         }
     }
-
 }

@@ -1,8 +1,8 @@
 package com.example.dictionaryapp;
 
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -35,19 +35,28 @@ public class MainActivity extends AppCompatActivity {
     TextView resusltTxt;
     SearchView searchView;
     String JSONSTR;
-    
+    private boolean FLAG = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null){
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+
+        if (savedInstanceState == null && !FLAG){
+            Log.d("FLAG", String.valueOf(FLAG));
+            FLAG = true;
             GetWordOfTheDayTask getWordOfTheDayTask = new GetWordOfTheDayTask();
             getWordOfTheDayTask.execute();
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean("Flag", FLAG);
+            editor.commit();
             Log.d("SavedInstance : ", "null");
         }
         else{
             Log.d("SavedInstance : ", "not null");
-            DisplayWordOfTheDayResult(JSONSTR);
+            String jsonStr = sharedPref.getString("JSONStr",null);
+            DisplayWordOfTheDayResult(jsonStr);
         }
 
         setContentView(R.layout.activity_main);
@@ -55,17 +64,13 @@ public class MainActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.textView);
         resusltTxt = (TextView) findViewById(R.id.meaning);
 
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
-
-//        GetWordOfTheDayTask getWordOfTheDayTask = new GetWordOfTheDayTask();
-//        getWordOfTheDayTask.execute();
-
         // Get the SearchView and set the searchable configuration
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) findViewById(R.id.searchView);
 
-        // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        // Current activity is not the searchable activity
+       //  searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchableActivity.class)));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
         EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
@@ -83,38 +88,15 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
-                Intent intent = new Intent(getApplicationContext(), SearchResultActivity.class);
-                intent.putExtra("query", query);
-                startActivity(intent);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
                 return false;
             }
         });
     }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    //    @Override
-//    protected void onPostResume() {
-//        super.onPostResume();
-//        String jsonStr = sharedPref.getString("JSONStr",null);
-//        DisplayWordOfTheDayResult(jsonStr);
-//        Log.d("OnPostResume : ", "done");
-//    }
 
     public class GetWordOfTheDayTask extends AsyncTask<String, Void, String> {
 
