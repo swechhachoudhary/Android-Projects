@@ -4,7 +4,7 @@
     android:id="@+id/search_result"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.dictionaryapp.SearchResultActivity">
+    tools:context="com.example.dictionaryapp.SearchableActivity">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -14,6 +14,8 @@
         android:textSize="30sp"
         android:gravity="center"
         android:textStyle="italic"
+        android:typeface="sans"
+        android:fontFamily="sans-serif"
         android:layout_alignParentTop="true" />
     <ScrollView
         android:layout_width="match_parent"
