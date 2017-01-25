@@ -5,14 +5,25 @@
     android:layout_height="match_parent"
     tools:context="com.example.dictionaryapp.MainActivity"
     android:background="@color/grey">
-        <android.support.v7.widget.SearchView
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:id="@+id/searchView"
+            android:layout_height="80dp"
+            android:id="@+id/searchLayout"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:background="@color/colorAccent"
-            android:theme="@style/SearchViewTheme"
-            />
+            android:layout_alignParentTop="true">
+            <android.support.v7.widget.SearchView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/searchView"
+                android:background="@drawable/search_view_border"
+                android:theme="@style/SearchViewTheme"/>
+        </LinearLayout>
+
 
         <TextView
             android:text="Word Of the day"
@@ -20,27 +31,28 @@
             android:layout_height="wrap_content"
             android:id="@+id/label"
             android:background="@drawable/corners"
-            android:layout_below="@+id/searchView"
+            android:layout_below="@+id/searchLayout"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:textSize="10sp" />
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:id="@+id/textView"
             android:layout_below="@+id/label"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="0dp"
             android:background="@color/colorAccent"
-            android:textSize="30sp"
+            android:textSize="35sp"
             android:textColor="#ffffff"
-            android:gravity="center_horizontal"
+            android:gravity="center_vertical|center_horizontal"
             android:textStyle="italic"
             android:typeface="sans"
-            android:fontFamily="sans-serif" />
-            <!--android:background="#8c9eff"-->
+            android:fontFamily="sans-serif"
+            tools:gravity="center_vertical|center_horizontal" />
 
 
     <ScrollView
@@ -49,17 +61,23 @@
         android:layout_below="@+id/textView"
         android:layout_marginRight="5dp"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="1dp"
         android:layout_marginBottom="10dp"
+        android:elevation="10dp"
         android:background="@drawable/corner_bottom"
         android:layout_alignParentBottom="true">
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:padding="5dp"
-            android:textColor="#000000"
-            android:id="@+id/meaning"/>
+            android:layout_height="wrap_content"
+            android:id="@+id/resultView"
+            android:orientation="vertical">
+
+        </LinearLayout>
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:padding="10dp"-->
+            <!--android:textColor="#000000"-->
+            <!--android:id="@+id/meaning"/>-->
     </ScrollView>
 
 </RelativeLayout>
